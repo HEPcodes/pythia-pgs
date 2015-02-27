@@ -559,7 +559,32 @@ C...GRV Family
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
-          ENDIF          
+          ENDIF
+C...NNPDFLO
+      ELSEIF((LHAINPUT .GE. 200000) .AND. (LHAINPUT .LE. 201000)) THEN
+      Q2MIN = 1D0
+      Q2MAX = 2.0D06
+      XMIN = 1.0D-9
+          IF(LHAINPUT.eq.200200) THEN
+           LHASET = 200200
+           LHANAME=LHAPATH(1:LHAPATHLEN)//
+     &                 '/NNPDF23_lo_as_0119_qed_mem0.LHgrid'
+          ELSEIF(LHAINPUT.eq.200400) THEN
+           LHASET = 200400
+           LHANAME=LHAPATH(1:LHAPATHLEN)//
+     &                '/NNPDF23_lo_as_0130_qed_mem0.LHgrid'
+          ELSE
+           WRITE(LHAPRINT,5150)  LHASET
+           STOP
+          ENDIF
+C...NNPDFNLO
+      ELSEIF(LHAINPUT .EQ. 244600) THEN
+      Q2MIN = 1D0
+      Q2MAX = 2.0D06
+      XMIN = 1.0D-9
+      LHASET = 244600
+      LHANAME=LHAPATH(1:LHAPATHLEN)//
+     &              '/NNPDF23nlo_as_0119_qed_mem0.LHgrid'
 C...
 C...Pions
 C...

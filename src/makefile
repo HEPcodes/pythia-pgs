@@ -84,8 +84,8 @@ PDFsets:
 pydata.f:
 	ln -sf ${PYDIR}/src/pydata.f
 
-$(PGS)/examples/olympics:
+$(PGS)/examples/olympics: libpythia libpgs libstdhep
 	cd $(PGS);make examples
 
-$(PGS)/examples/clean_output:
+$(PGS)/examples/clean_output: libpythia libpgs libstdhep
 	cd $(PGS);make examples

@@ -1,5 +1,7 @@
 Update notes for the Pythia-PGS package used by MadGraph/MadEvent
 
+2.2.1 (21/02/14) Fix a compilation issue on some linux
+
 2.2.0  (16/12/13) Read and store information needed for systematics
        studies. Read more in the file Template/README.systematics
        - Allow for mixed number of matching jets in processes, as needed
