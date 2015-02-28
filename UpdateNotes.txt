@@ -1,5 +1,8 @@
 Update notes for the Pythia-PGS package used by MadGraph/MadEvent
 
+2.4.0 (04/07/14) - Support for LHEFv3 format
+                 - support for switching to cteq6l1 if the pdf set is not supported by this package 
+
 2.3.0 (22/04/14) Support for stdhep file with size larger than 4 Go. External tools might not support the new format.
 
 2.2.1 (21/02/14) Fix a compilation issue on some linux

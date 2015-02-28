@@ -510,11 +510,14 @@ C...Inputs for the matching algorithm
       common/MEMAIN/etcjet,rclmax,etaclmax,qcut,clfact,maxjets,minjets,
      $   iexcfile,ktsche,mektsc,nexcres,excres,nremres,remres,
      $   nqmatch,nexcproc,iexcproc,iexcval,nosingrad,showerkt,jetprocs
-
+      INTEGER LHAPDF_IF_UNKNOW
+      COMMON/LHAPDF_IF_UNKNOW/LHAPDF_IF_UNKNOW
       INTEGER ios,i
       CHARACTER*80 pythia_card
       CHARACTER*132 line
       
+      LHAPDF_IF_UNKNOW = 0
+
       if (pythia_card.ne.' ') then
         open (85, file=pythia_card, status='old',
      .     form='formatted')    ! removed for Linux: readonly)
@@ -530,6 +533,7 @@ C...Inputs for the matching algorithm
                 cycle
              endif
              call downcase_line(line,132)
+             write(*,*) line
              if(index(line,'psscale').ne.0) then
                 READ(line(index(line,'=')+1:),*,err=100) MSCAL
                 write(*,*) 'Set scale choice to ',MSCAL
@@ -546,6 +550,9 @@ C...Inputs for the matching algorithm
              else if(index(line,'qcut').ne.0) then
                 READ(line(index(line,'=')+1:),*,err=100) qcut
                 write(*,*) 'Read Qcut   = ',qcut
+             else if(index(line,'lhaid').ne.0) then
+               READ(line(index(line,'=')+1:),*,err=100)LHAPDF_IF_UNKNOW
+               write(*,*) 'Read LHAID   = ',LHAPDF_IF_UNKNOW
              else if(index(line,'etcjet').ne.0) then
                 READ(line(index(line,'=')+1:),*,err=100) etcjet
                 write(*,*) 'Read Etcjet   = ',etcjet

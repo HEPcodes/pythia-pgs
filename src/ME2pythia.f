@@ -133,6 +133,10 @@ C...Functions
 C...Format for reading lines.
       CHARACTER*6 STRFMT
       CHARACTER*20 CGIVE
+C...Store temporary line
+      CHARACTER*1000 TMPLINE
+      integer index0
+
       STRFMT='(A000)'
       WRITE(STRFMT(3:5),'(I3)') MAXLEN
 
@@ -159,12 +163,26 @@ C...Allow indentation.
       IF(STRING(IBEG:IBEG+5).NE.'<init>'.AND.
      &STRING(IBEG:IBEG+5).NE.'<init ') GOTO 100
 
-C...Read first line of initialization info.
-      READ(LNHIN,*,END=130,ERR=130) IDBMUP(1),IDBMUP(2),EBMUP(1),
-     &EBMUP(2),PDFGUP(1),PDFGUP(2),PDFSUP(1),PDFSUP(2),IDWTUP,NPRUP
 
+C...Read first line of initialization info.
+ 111  READ(LNHIN,'(a1000)',END=130) TMPLINE
+      READ(TMPLINE,*,END=130,ERR=112) IDBMUP(1),IDBMUP(2),EBMUP(1),
+     &EBMUP(2),PDFGUP(1),PDFGUP(2),PDFSUP(1),PDFSUP(2),IDWTUP,NPRUP
+      TMPLINE = ''
+      goto 114
+
+C...Skip the <generator line if present 
+ 112  index0 = index(TMPLINE, "<generator")
+      if (index0.eq.0) goto 130
+ 113  index0 = index(TMPLINE, "</generator>")
+      if (index0.gt.0) goto 111
+      index0 = index(TMPLINE, "2212")
+      if (index0.gt.0) goto 130
+
+      READ(LNHIN,*,END=130) TMPLINE
+      goto 113
 C...Read NPRUP subsequent lines with information on each process.
-      DO 120 IPR=1,NPRUP
+ 114  DO 120 IPR=1,NPRUP
         READ(LNHIN,*,END=130,ERR=130) XSECUP(IPR),XERRUP(IPR),
      &  XMAXUP(IPR),LPRUP(IPR)
   120 CONTINUE
@@ -317,8 +335,13 @@ C...Format for reading lines.
       CHARACTER*6 STRFMT
       CHARACTER*1 CDUM
 
+C...  integer for parsing string
+      integer index0, index1, index2 
+
       STRFMT='(A000)'
       WRITE(STRFMT(3:5),'(I3)') MAXLEN
+
+
 
 C...Loop until finds line beginning with "<event>" or "<event ". 
   100 READ(LNHIN,STRFMT,END=900,ERR=900) STRING
@@ -438,10 +461,25 @@ C...(example function included below)
       IF(ickkw.eq.0.AND.MSCAL.GT.0) CALL PYMASC(SCALUP)
 c      IF(MINT(35).eq.3.AND.ickkw.EQ.1) SCALUP=SQRT(PARP(67))*SCALUP
       
-C...Read generation scale for all FS particles (as comment in event file)
+C...Read generation scale for all FS particles (as comment in event file or in <scale)
       IF(ickkw.eq.1)THEN
-        READ(LNHIN,'(a)',END=900,ERR=130) SYSTSTR(1)
-        READ(SYSTSTR(1),*,END=130,ERR=130) CDUM,(PTCLUS(I),I=1,NEX)
+        READ(LNHIN,'(a1000)',END=900,ERR=130) SYSTSTR(1)
+        if (SYSTSTR(1)(1:1).eq.'#')then
+           READ(SYSTSTR(1),*,END=130,ERR=130) CDUM,(PTCLUS(I),I=1,NEX)
+        else if (SYSTSTR(1)(1:6).eq.'<scale')then
+           index0 = 1
+           index1 = 1
+           index2 = 1
+           DO I=1,20
+             index0=index2+INDEX(SYSTSTR(1)(index2+1:1000), 
+     $                            'pt_clust_')
+             if (index0.eq.index2) goto 130
+             index1 = index0+INDEX(SYSTSTR(1)(index0:1000), '"')-1
+             index2 = index1+INDEX(SYSTSTR(1)(index1+1:1000), '"')
+             read(SYSTSTR(1)(index1+1:index2-1),*,END=130) PTCLUS(I)
+           ENDDO
+           
+        endif
  130    CONTINUE
         SYSTSTR(1)=''
       ENDIF

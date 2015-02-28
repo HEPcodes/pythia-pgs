@@ -203,6 +203,9 @@ C...Interface to LHAPDFLIB.
       COMMON/LHAGLSTA/ XMINNUM,XMAXNUM,Q2MINNUM,Q2MAXNUM,TOTNUM,
      >                 XMINNUP,XMAXNUP,Q2MINNUP,Q2MAXNUP,TOTNUP
       SAVE/LHAGLSTA/
+C...Interface for lhapdf5/6 replacement
+      INTEGER LHAPDF_IF_UNKNOW
+      COMMON/LHAPDF_IF_UNKNOW/LHAPDF_IF_UNKNOW
 C...Interface to PDFLIB.
       COMMON/W50511/ NPTYPEPDFL,NGROUPPDFL,NSETPDFL,MODEPDFL,
      >               NFLPDFL,LOPDFL,TMASPDFL
@@ -298,7 +301,7 @@ C...
 C...Protons
 C...
 C...CTEQ Family
-        IF((LHAINPUT .GE. 10000) .AND. (LHAINPUT .LE. 19999)) THEN
+ 10     IF((LHAINPUT .GE. 10000) .AND. (LHAINPUT .LE. 19999)) THEN
 	  Q2MAX = 1.0D08
           IF((LHAINPUT .GE. 10000) .AND. (LHAINPUT .LE. 10040)) THEN
            LHASET = 10000
@@ -560,31 +563,6 @@ C...GRV Family
            WRITE(LHAPRINT,5150)  LHASET
            STOP
           ENDIF
-C...NNPDFLO
-      ELSEIF((LHAINPUT .GE. 200000) .AND. (LHAINPUT .LE. 201000)) THEN
-      Q2MIN = 1D0
-      Q2MAX = 2.0D06
-      XMIN = 1.0D-9
-          IF(LHAINPUT.eq.200200) THEN
-           LHASET = 200200
-           LHANAME=LHAPATH(1:LHAPATHLEN)//
-     &                 '/NNPDF23_lo_as_0119_qed_mem0.LHgrid'
-          ELSEIF(LHAINPUT.eq.200400) THEN
-           LHASET = 200400
-           LHANAME=LHAPATH(1:LHAPATHLEN)//
-     &                '/NNPDF23_lo_as_0130_qed_mem0.LHgrid'
-          ELSE
-           WRITE(LHAPRINT,5150)  LHASET
-           STOP
-          ENDIF
-C...NNPDFNLO
-      ELSEIF(LHAINPUT .EQ. 244600) THEN
-      Q2MIN = 1D0
-      Q2MAX = 2.0D06
-      XMIN = 1.0D-9
-      LHASET = 244600
-      LHANAME=LHAPATH(1:LHAPATHLEN)//
-     &              '/NNPDF23nlo_as_0119_qed_mem0.LHgrid'
 C...
 C...Pions
 C...
@@ -808,6 +786,11 @@ C...SAS-G Family
            STOP
           ENDIF          
 C...Unknown Family ?! Giving up
+        ELSEIF(LHAPDF_IF_UNKNOW.ne.0)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10
         ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
