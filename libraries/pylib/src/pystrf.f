@@ -184,6 +184,7 @@ C...this is usually the case!
         GOTO 140
       ELSEIF(NTRY.GT.100.OR.NTRYR.GT.100) THEN
         CALL PYERRM(14,'(PYSTRF:) caught in infinite loop')
+        IF(MSTU(21).EQ.2) MSTU(90)=0
         IF(MSTU(21).GE.1) RETURN
       ENDIF
       I=N+NRS
@@ -328,6 +329,7 @@ C...Start preparing for fragmentation of two strings from junction.
         ISTA=I
         NTRYER=0
   320   NTRYER=NTRYER+1
+        MSTU(90)=MSTU90
         I=ISTA
         DO 620 IU=1,2
           NS=IABS(IJU(IU+1)-IJU(IU))
@@ -376,6 +378,7 @@ C...Junction strings: initialize flavour, momentum and starting pos.
             GOTO 140
           ELSEIF(NTRY.GT.100) THEN
             CALL PYERRM(14,'(PYSTRF:) caught in infinite loop')
+            IF(MSTU(21).EQ.2) MSTU(90)=0
             IF(MSTU(21).GE.1) RETURN
           ENDIF
           I=ISAV
@@ -652,6 +655,7 @@ C...Junction strings: particle four-momentum, remainder, loop back.
 C...Junction strings: save quantities left after each string.
           IF(IABS(KFL(1)).GT.10) GOTO 360
   600     I=I-1
+          IF(MSTU(90+MSTU(90)).EQ.I+1) MSTU(90)=MSTU(90)-1 
           KFJH(IU)=KFL(1)
           DO 610 J=1,4
             PJU(IU+3,J)=PJU(IU+3,J)-P(I+1,J)
@@ -750,6 +754,7 @@ C...Begin initialization: sum up energy, set starting position.
         GOTO 140
       ELSEIF(NTRY.GT.100) THEN
         CALL PYERRM(14,'(PYSTRF:) caught in infinite loop')
+        IF(MSTU(21).EQ.2) MSTU(90)=0
         IF(MSTU(21).GE.1) RETURN
       ENDIF
       I=ISAV

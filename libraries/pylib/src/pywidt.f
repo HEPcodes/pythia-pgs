@@ -68,7 +68,7 @@ C...Reset width information.
           WDTE(I,J)=0D0
   100   CONTINUE
   110 CONTINUE
- 
+
 C...Allow for fudge factor to rescale resonance width.
       FUDGE=1D0
       IF(MSTP(110).NE.0.AND.(MWID(KC).EQ.1.OR.MWID(KC).EQ.2.OR.
@@ -175,7 +175,7 @@ C...Naive partial width and alternative threshold factors.
           ENDIF
           WDTP(I)=FUDGE*WDTP(I)
           WDTP(0)=WDTP(0)+WDTP(I)
- 
+
 C...Calculate secondary width (at most two identical/opposite).
           WID2=1D0
           IF(MDME(IDC,1).GT.0) THEN
@@ -258,10 +258,17 @@ C...Calculate secondary width (at most two identical/opposite).
             ENDIF
  
 C...Store effective widths according to case.
-            WDTE(I,MDME(IDC,1))=WDTP(I)*WID2
-            WDTE(0,MDME(IDC,1))=WDTE(0,MDME(IDC,1))+WDTE(I,MDME(IDC,1))
-            WDTE(I,0)=WDTE(I,MDME(IDC,1))
-            WDTE(0,0)=WDTE(0,0)+WDTE(I,0)
+C...PS: bug fix 16/2 2012 to avoid problems caused by adding 0.0*NaN
+            IF (WDTP(I).GT.0D0) THEN
+              WDTE(I,MDME(IDC,1))=WDTP(I)*WID2
+              WDTE(0,MDME(IDC,1))=WDTE(0,MDME(IDC,1))
+     &             +WDTE(I,MDME(IDC,1))
+              WDTE(I,0)=WDTE(I,MDME(IDC,1))
+              WDTE(0,0)=WDTE(0,0)+WDTE(I,0)
+            ELSE
+              WDTE(I,MDME(IDC,1))= 0D0
+              WDTE(I,0)= 0D0
+            ENDIF
           ENDIF
   120   CONTINUE
 C...Return.
@@ -1427,12 +1434,12 @@ C...W'+/- -> l+/- + nu
               ENDIF
             ENDIF
             WDTP(I)=FAC*0.5*FCOF*(2D0-RM1-RM2-(RM1-RM2)**2)
-     &           *SQRT(MAX(0D0,(1D0-RM1-RM2)**2-4D0*RM1*RM2))            
+     &           *SQRT(MAX(0D0,(1D0-RM1-RM2)**2-4D0*RM1*RM2))     
             IF (RM1.GT.0D0.AND.RM2.GT.0D0) THEN
 C...PS 28/06/2010
 C...Inserted (gV2-gA2)*sqrt(m1*m2) term (FCOF2), following M. Chizhov
               WDTP(I)=WDTP(I) + FAC*0.5*6D0*FCOF2*SQRT(RM1*RM2)
-     &             *SQRT(MAX(0D0,(1D0-RM1-RM2)**2-4D0*RM1*RM2))            
+     &             *SQRT(MAX(0D0,(1D0-RM1-RM2)**2-4D0*RM1*RM2)) 
             ENDIF
           ELSEIF(I.EQ.21) THEN
 C...W'+/- -> W+/- + Z0

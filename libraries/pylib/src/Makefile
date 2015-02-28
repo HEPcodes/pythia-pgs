@@ -1,4 +1,5 @@
-SRCS := $(wildcard *.f)
+#SRCS := $(wildcard *.f)
+SRCS := $(wildcard py*.f) $(wildcard struct*.f) $(wildcard up*.f) ssmssm.f sugra.f visaje.f $(wildcard fh*.f) pdfset.f
 OBJS = ${SRCS:.f=.o}
 
 include ../../../src/make_opts
@@ -19,3 +20,8 @@ all: ../lib/libpythiaext.a
 ../lib/libpythiaext.a: ${OBJS}
 	ar rcu ../lib/libpythiaext.a ${OBJS}
 	ranlib ../lib/libpythiaext.a 
+
+clean:
+	rm -rf ../lib/libpythiaext.a *.o
+
+# DO NOT DELETE

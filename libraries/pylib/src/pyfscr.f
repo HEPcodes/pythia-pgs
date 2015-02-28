@@ -1,4 +1,4 @@
-
+ 
 C*********************************************************************
  
 C...PYFSCR
@@ -18,21 +18,21 @@ C...Type S is driven by starting only from free triplets, not octets.
 C...Type P is also driven by free triplets, but the reconnect probability
 C...is computed from the string density per unit rapidity, where the axis
 C...with respect to which the rapidity is computed is the Thrust axis of the
-C...event. 
+C...event.
 C...A string piece remains unchanged with probability
 C...    PKEEP = (1-PARP(78))**N
 C...This scaling corresponds to each string piece having to go through
 C...N other ones, each with probability PARP(78) for reconnection.
-C...For types I, II, and S, N is chosen simply as the number of multiple 
+C...For types I, II, and S, N is chosen simply as the number of multiple
 C...interactions, for a rough scaling with the general level of activity.
-C...For type P, N is chosen to be the number of string pieces in a given 
-C...interval of rapidity (minus one, since the string doesn't reconnect 
-C...with itself), and the reconnect probability is interpreted as the 
-C...probability per unit rapidity. 
+C...For type P, N is chosen to be the number of string pieces in a given
+C...interval of rapidity (minus one, since the string doesn't reconnect
+C...with itself), and the reconnect probability is interpreted as the
+C...probability per unit rapidity.
 C...It also also possible to apply a dampening factor to the CR strength,
 C...using PARP(77), which will cause reconnections among high-pT string
-C...pieces to be suppressed. 
-
+C...pieces to be suppressed.
+ 
       SUBROUTINE PYFSCR(IP)
 C...Double precision and integer declarations.
       IMPLICIT DOUBLE PRECISION(A-H, O-Z)
@@ -73,7 +73,7 @@ C...Erase any existing colour tags for this event
         DO 100 I=1,N
           MCT(I,1)=0
           MCT(I,2)=0
- 100    CONTINUE
+  100   CONTINUE
 C...Create colour tags for this event
         DO 120 I=1,N
           IF (K(I,1).EQ.3) THEN
@@ -82,9 +82,9 @@ C...Create colour tags for this event
               IF (MCT(I,KCSIN-3).EQ.0) THEN
                 CALL PYCTTR(I,KCSIN,I)
               ENDIF
- 110        CONTINUE
+  110       CONTINUE
           ENDIF
- 120    CONTINUE
+  120   CONTINUE
 C...Instruct PYPREP to use colour tags
         MINT(33)=1
       ENDIF
@@ -111,14 +111,14 @@ C...For Paquis type, determine thrust axis (default along Z axis)
         TY = P(N+1,2)
         TZ = P(N+1,3)
       ENDIF
-      
+ 
 C...For each final-state dipole, check whether string should be
 C...preserved.
       NCR=0
       IA=0
       IC=0
       RAPMAX=0.0
-
+ 
       ICTMIN=NCT
       DO 150 ICT=1,NCT
         IA=0
@@ -131,7 +131,7 @@ C...preserved.
 C...Save smallest NCT value so far
           ICTMIN = MIN(ICTMIN,ICT)
 C...For Paquis algorithm, just store all string pieces for now
-          IF (MSTP95.GE.8) THEN 
+          IF (MSTP95.GE.8) THEN
 C...  Add coloured parton
             NCR=NCR+1
             ICR(NCR)=IC
@@ -144,7 +144,7 @@ C...  Add pion mass headroom to energy for this calculation
             RLOPTC(NCR)=LOG((EET+PZT)/(EET-PZT))
 C...  Add anti-coloured parton
             NCR       = NCR+1
-            ICR(NCR)  = IA   
+            ICR(NCR)  = IA
             MSCR(NCR) = 2
             IOPT(NCR) = 0
 C...  Store rapidity (along Thrust axis) in RLOPT for the time being
@@ -188,7 +188,7 @@ C...  Add coloured parton
               RLOPTC(NCR)=1D19
 C...  Add anti-coloured parton
               NCR=NCR+1
-              ICR(NCR)=IA   
+              ICR(NCR)=IA
               MSCR(NCR)=2
               IOPT(NCR)=0
               RLOPTC(NCR)=1D19
@@ -196,41 +196,41 @@ C...  Add anti-coloured parton
           ENDIF
         ENDIF
   150 CONTINUE
-
+ 
 C...PAQUIS TYPE
       IF (MSTP95.GE.8) THEN
 C...  For Paquis type, make "histogram" of string densities along thrust axis
         RAPMIN = -RAPMAX
         DRAP   = 2*RAPMAX/(1D0*NBINY)
 C...  Explicitly zero histogram bin content
-        DO 147 IBINY=1,NBINY
+        DO 160 IBINY=1,NBINY
           NSTRY(IBINY)=0
- 147    CONTINUE
-        DO 152 ISTR=1,NCR-1,2
+  160   CONTINUE
+        DO 180 ISTR=1,NCR-1,2
           IC = ICR(ISTR)
           IA = ICR(ISTR+1)
           Y1 = MIN(RLOPTC(ISTR),RLOPTC(ISTR+1))
           Y2 = MAX(RLOPTC(ISTR),RLOPTC(ISTR+1))
-          DO 153 IBINY=1,NBINY
+          DO 170 IBINY=1,NBINY
             YBINLO = RAPMIN + (IBINY-1)*DRAP
 C...  If bin inside string piece, add 1 in this bin
 C...  (Strictly speaking: if it starts before midpoint and ends after midpoint)
             IF (Y1.LE.YBINLO+0.5*DRAP.AND.Y2.GE.YBINLO+0.5*DRAP)
      &           NSTRY(IBINY) = NSTRY(IBINY) + 1
- 153      CONTINUE
- 152    CONTINUE
+  170     CONTINUE
+  180   CONTINUE
 C...  Loop over pieces to find individual reconnect probability
-        DO 167 IS=1,NCR-1,2
+        DO 200 IS=1,NCR-1,2
           DNSUM  = 0D0
           DNAVG  = 0D0
 C...Beginning at Y = RAPMIN = -RAPMAX, ending at Y = RAPMAX
           RBINLO = (MIN(RLOPTC(IS),RLOPTC(IS+1))-RAPMIN)/DRAP + 0.5
-          RBINHI = (MAX(RLOPTC(IS),RLOPTC(IS+1))-RAPMIN)/DRAP + 0.5    
+          RBINHI = (MAX(RLOPTC(IS),RLOPTC(IS+1))-RAPMIN)/DRAP + 0.5
 C...Make sure integer bin numbers lie inside proper range
           IBINLO = MAX(1,MIN(NBINY,NINT(RBINLO)))
           IBINHI = MAX(1,MIN(NBINY,NINT(RBINHI)))
 C...Size of rapidity bins (is < DRAP if piece smaller than one bin)
-C...(also smaller than DRAP if a one-unit wide piece is stretched 
+C...(also smaller than DRAP if a one-unit wide piece is stretched
 C... over 2 bins, thus making the computation more accurate)
           DRAPAV = (RBINHI-RBINLO)/(IBINHI-IBINLO+1)*DRAP
 C...  Decide whether to suppress reconnections in high-pT string pieces
@@ -241,25 +241,25 @@ C...  Total string piece energy, momentum squared, and components
             PPS2 = (P(ICR(IS),1)+ P(ICR(IS+1),1))**2
      &           + (P(ICR(IS),2)+ P(ICR(IS+1),2))**2
      &           + (P(ICR(IS),3)+ P(ICR(IS+1),3))**2
-            PZTS = P(ICR(IS),1)*TX+P(ICR(IS),2)*TY+P(ICR(IS),3)*TZ 
+            PZTS = P(ICR(IS),1)*TX+P(ICR(IS),2)*TY+P(ICR(IS),3)*TZ
      &           + P(ICR(IS+1),1)*TX+P(ICR(IS+1),2)*TY+P(ICR(IS+1),3)*TZ
             PTTS = SQRT(PPS2 - PZTS**2)
 C...  Mass of string piece in units of mpi (at least 1)
-            RMPI2  = 0.135D0 
+            RMPI2  = 0.135D0
             RM2STR = MAX(RMPI2,EES**2 - PPS2)
 C...  Estimate number of pions ~ log(M2) (at least 1)
             RNPI   = LOG(RM2STR/RMPI2)+1D0
             PT2AVG = (PTTS / RNPI)**2
-C...  Supress reconnection probability by 1/(1+P77*P2AVG)        
+C...  Supress reconnection probability by 1/(1+P77*P2AVG)
             CRMODF=1D0/(1D0+PARP(77)**2*PT2AVG)
           ENDIF
           PKEEP = 1.0
-          DO 178 IBINY=IBINLO,IBINHI
+          DO 190 IBINY=IBINLO,IBINHI
 C            DNSUM = DNSUM + 1D0
             DNOVL = MAX(0,NSTRY(IBINY)-1)
             PKEEP = PKEEP * (1D0-CRMODF*PARP(78))**(DRAPAV*DNOVL)
 C            DNAVG = DNAVG + MAX(1,NSTRY(IBINY))
- 178      CONTINUE
+  190     CONTINUE
 C          DNAVG = DNAVG / DNSUM
 C...  If keeping string piece, save
           IF (PYR(0).LE.PKEEP) THEN
@@ -267,19 +267,19 @@ C...  If keeping string piece, save
             MCN(ICR(IS),1)=LCT
             MCN(ICR(IS+1),2)=LCT
           ENDIF
- 167    CONTINUE
+  200   CONTINUE
       ENDIF
-
+ 
 C...Skip if there is only one possibility
       IF (NCR.LE.2) THEN
         GOTO 9999
       ENDIF
-
+ 
 C...Reorder, so ordered in I (in order to correspond to old algorithm)
       NLOOP=0
- 151  NLOOP=NLOOP+1
+  210 NLOOP=NLOOP+1
       MORD=1
-      DO 155 IC1=1,NCR-1
+      DO 220 IC1=1,NCR-1
         I1=ICR(IC1)
         I2=ICR(IC1+1)
         IF (I1.GT.I2) THEN
@@ -291,10 +291,10 @@ C...Reorder, so ordered in I (in order to correspond to old algorithm)
           MSCR(IC1+1)=MST
           MORD=0
         ENDIF
- 155  CONTINUE
+  220 CONTINUE
 C...Max do 1000 reordering loops
-      IF (MORD.EQ.0.AND.NLOOP.LE.1000) GOTO 151
-
+      IF (MORD.EQ.0.AND.NLOOP.LE.1000) GOTO 210
+ 
 C...PS: 03 May 2010
 C...For Seattle and Paquis types, check if there is a dangling tag
 C...Needed for special case when entire reconnected state was one or
@@ -302,7 +302,7 @@ C...more gluon loops in original topology in which case these CR
 C...algorithms need to be told they shouldn't look for a dangling tag.
       M3FREE=0
       IF (MSTP95.GE.6.AND.MSTP95.LE.9) THEN
-        DO 157 IC1=1,NCR
+        DO 230 IC1=1,NCR
           I1=ICR(IC1)
 C...Color charge
           MCI=KCHG(PYCOMP(K(I1,2)),2)*ISIGN(1,K(I1,2))
@@ -312,35 +312,35 @@ C...Color charge
             IF (MCN(I1,1).NE.0.AND.MCN(I1,2).EQ.0) M3FREE=1
             IF (MCN(I1,2).NE.0.AND.MCN(I1,1).EQ.0) M3FREE=1
           ENDIF
- 157    CONTINUE
+  230   CONTINUE
       ENDIF
-
+ 
 C...Loop over CR partons
 C...(Ignore junctions for now.)
       NLOOP=0
-  160 NLOOP=NLOOP+1
+  240 NLOOP=NLOOP+1
       RLMAX=0D0
       ICRMAX=0
 C...Loop over coloured partons
-      DO 230 IC1=1,NCR
+      DO 260 IC1=1,NCR
 C...Retrieve parton Event Record index and Colour Side
         I=ICR(IC1)
         MSI=MSCR(IC1)
-C...Skip already connected partons        
-        IF (MCN(I,MSI).NE.0) GOTO 230
+C...Skip already connected partons
+        IF (MCN(I,MSI).NE.0) GOTO 260
 C...Shorthand for colour charge
         MCI=KCHG(PYCOMP(K(I,2)),2)*ISIGN(1,K(I,2))
 C...For Seattle algorithm, only start from partons with one dangling
 C...colour tag (unless there aren't any, cf. M3FREE above.)
-        IF (MSTP(95).GE.6.AND.MSTP(95).LE.9) THEN          
+        IF (MSTP(95).GE.6.AND.MSTP(95).LE.9) THEN
           IF (MCI.EQ.2.AND.MCN(I,1).EQ.0.AND.MCN(I,2).EQ.0
      &         .AND.M3FREE.EQ.1) THEN
-            GOTO 230
+            GOTO 260
           ENDIF
         ENDIF
-C...Retrieve saved optimal partner                
-        IO=IOPT(IC1) 
-        IF (IO.NE.0) THEN 
+C...Retrieve saved optimal partner
+        IO=IOPT(IC1)
+        IF (IO.NE.0) THEN
 C...Reject saved optimal partner if latter is now connected
 C...(Also reject if using model S1, since saved partner may
 C...now give rise to gg loop.)
@@ -356,15 +356,15 @@ C...Search for new optimal partner if necessary
           MGGOPT=0
           RLOPT=1D19
 C...Loop over partons you can connect to
-          DO 210 IC2=1,NCR
+          DO 250 IC2=1,NCR
             J=ICR(IC2)
             MSJ=MSCR(IC2)
 C...Skip if already connected
-            IF (MCN(J,MSJ).NE.0) GOTO 210
+            IF (MCN(J,MSJ).NE.0) GOTO 250
 C...Skip if this not colour-anticolour pair
-            IF (MSI.EQ.MSJ) GOTO 210          
+            IF (MSI.EQ.MSJ) GOTO 250
 C...And do not let gluons connect to themselves
-            IF (I.EQ.J) GOTO 210
+            IF (I.EQ.J) GOTO 250
 C...Suppress direct connections between partons in same Beam Remnant
             MBRSTR=0
             IF (K(I,3).LE.2.AND.K(I,3).GE.1.AND.K(I,3).EQ.K(J,3))
@@ -386,7 +386,7 @@ C...string with a small Lambda measure as the last step, this connection
 C...will be saved regardless of whether other possibilities existed.
 C...I.e., there should really be a check whether another possibility has
 C...already been found, but since these models are now actively in use
-C...and uncertainties are anyway large, the algorithm is left as it is. 
+C...and uncertainties are anyway large, the algorithm is left as it is.
 C...(correction --> Pythia 8 ?)
             IF (RL.LT.RLOPT.OR.(RL.EQ.RLOPT.AND.PYR(0).LE.0.5D0)
      &          .OR.(MBROPT.EQ.1.AND.MBRSTR.EQ.0)
@@ -405,7 +405,7 @@ C...Paquis type: fix problem above
                 MGGOPT=MGGSTR
               ENDIF
             ENDIF
- 210      CONTINUE
+  250     CONTINUE
         ENDIF
         IF (IOPT(IC1).NE.0) THEN
 C...Save pair with largest RLOPT so far
@@ -414,7 +414,7 @@ C...Save pair with largest RLOPT so far
             RLMAX=RLOPT
           ENDIF
         ENDIF
- 230  CONTINUE
+  260 CONTINUE
 C...Save and iterate
       ICMAX=0
       IF (ICRMAX.GT.0) THEN
@@ -424,58 +424,58 @@ C...Save and iterate
         ICMAX=MSCR(ICRMAX)
         JCMAX=3-ICMAX
         MCN(ILMAX,ICMAX)=LCT
-        MCN(JLMAX,JCMAX)=LCT        
+        MCN(JLMAX,JCMAX)=LCT
         IF (NLOOP.LE.2*(N-IP)) THEN
-          GOTO 160
+          GOTO 240
         ELSE
           CALL PYERRM(31,' PYFSCR: infinite loop in color annealing')
           CALL PYSTOP(11)
         ENDIF
       ELSE
 C...Save and exit. First check for leftover gluon(s)
-        DO 260 I=MAX(1,IP),N
+        DO 290 I=MAX(1,IP),N
 C...Check colour charge
           MCI=KCHG(PYCOMP(K(I,2)),2)*ISIGN(1,K(I,2))
-          IF (K(I,1).NE.3.OR.MCI.NE.2) GOTO 260
+          IF (K(I,1).NE.3.OR.MCI.NE.2) GOTO 290
           IF(MCN(I,1).EQ.0.AND.MCN(I,2).EQ.0) THEN
 C...Decide where to put left-over gluon (minimal insertion)
             ICMAX=0
             RLMAX=1D19
 C...PS: Bug fix 30 Apr 2010: try all lines, not just reconnected ones
-            DO 250 KCT=ICTMIN,LCT
+            DO 280 KCT=ICTMIN,LCT
               IC=0
               IA=0
-              DO 240 IT=MAX(1,IP),N
-                IF (IT.EQ.I.OR.K(IT,1).NE.3) GOTO 240
+              DO 270 IT=MAX(1,IP),N
+                IF (IT.EQ.I.OR.K(IT,1).NE.3) GOTO 270
                 IF (MCN(IT,1).EQ.KCT) IC=IT
                 IF (MCN(IT,2).EQ.KCT) IA=IT
- 240          CONTINUE
+  270         CONTINUE
 C...Skip if this color tag no longer present in event record
-              IF (IC.EQ.0.OR.IA.EQ.0) GOTO 250
+              IF (IC.EQ.0.OR.IA.EQ.0) GOTO 280
               RL=FOUR(IC,I)*FOUR(IA,I)
               IF (RL.LT.RLMAX) THEN
                 RLMAX=RL
                 ICMAX=IC
                 IAMAX=IA
               ENDIF
- 250        CONTINUE
+  280       CONTINUE
             LCT=LCT+1
             MCN(I,1)=MCN(ICMAX,1)
             MCN(I,2)=LCT
             MCN(ICMAX,1)=LCT
           ENDIF
- 260    CONTINUE
+  290   CONTINUE
 C...Here we need to loop over entire event.
-        DO 270 IZ=MAX(1,IP),N
+        DO 300 IZ=MAX(1,IP),N
 C...Do not erase parton shower colour history
-          IF (K(IZ,1).NE.3) GOTO 270
+          IF (K(IZ,1).NE.3) GOTO 300
 C...Check colour charge
           MCI=KCHG(PYCOMP(K(IZ,2)),2)*ISIGN(1,K(IZ,2))
-          IF (MCI.EQ.0) GOTO 270
+          IF (MCI.EQ.0) GOTO 300
           IF (MCN(IZ,1).NE.0) MCT(IZ,1)=MCN(IZ,1)
           IF (MCN(IZ,2).NE.0) MCT(IZ,2)=MCN(IZ,2)
- 270    CONTINUE
+  300   CONTINUE
       ENDIF
-      
+ 
  9999 RETURN
       END

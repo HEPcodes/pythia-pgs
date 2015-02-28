@@ -40,6 +40,7 @@ C...Stop if no subprocesses on.
         WRITE(MSTU(11),5100)
         STOP
       ENDIF
+
  
 C...Special flags for hard-process generation only.
       MSTP71=MSTP(71)
@@ -137,6 +138,10 @@ C...Check that no odd resonance left undecayed.
           ENDIF
         ENDIF
   120 CONTINUE
+C...Add the option to veto or select certain types of events
+      IVETO=0
+      IF(MSTP(143).EQ.1) CALL PYVETO(IVETO)
+      IF(IVETO.EQ.1) GOTO 100
  
 C...Boost hadronic subsystem to overall rest frame.
 C..(Only relevant when photon inside lepton beam.)
@@ -202,6 +207,8 @@ C...Trace colour tags; convert to LHA style labels.
           ENDIF
         ENDIF
   160 CONTINUE
+C...Error checking
+      IF(MSTI(52).EQ.0) THEN
  
 C...Put event in HEPEUP commonblock.
       NUP=N-MINT(84)
@@ -222,11 +229,18 @@ C...Put event in HEPEUP commonblock.
           MOTHUP(2,I)=2
         ELSE
           ISTUP(I)=1
-          MOTHUP(1,I)=K(I+MINT(84),3)-MINT(84)
-          MOTHUP(2,I)=0
+C...Necessary check for some processes, such as VV->VV
+          IF(K(I+MINT(84),3)-MINT(84).GT.0) THEN
+            MOTHUP(1,I)=K(I+MINT(84),3)-MINT(84)
+            MOTHUP(2,I)=0
+          ELSE
+            MOTHUP(1,I)=1
+            MOTHUP(2,I)=2
+          ENDIF
         ENDIF
-        IF(I.GE.3.AND.K(I+MINT(84),3).GT.0)
-     &  ISTUP(K(I+MINT(84),3)-MINT(84))=2
+C...Check positivity of index for certain cases
+        IF(I.GE.3.AND.K(I+MINT(84),3)-MINT(84).GT.0) 
+     $  ISTUP(K(I+MINT(84),3)-MINT(84))=2
         ICOLUP(1,I)=MCT(I+MINT(84),1)
         ICOLUP(2,I)=MCT(I+MINT(84),2)
         DO 170 J=1,5
@@ -235,7 +249,9 @@ C...Put event in HEPEUP commonblock.
         VTIMUP(I)=V(I,5)
         SPINUP(I)=9D0
   180 CONTINUE
- 
+
+      ENDIF
+
 C...Optionally write out event to disk. Minimal size for time/spin fields.
       IF(MSTP(162).GT.0) THEN
         WRITE(MSTP(162),5200) NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP

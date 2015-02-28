@@ -36,6 +36,8 @@ C...Local arrays.
       DIMENSION IPOS(2*MAXNUR),IREC(2*MAXNUR),IFLG(2*MAXNUR),
      &ISCOL(2*MAXNUR),ISCHG(2*MAXNUR),PTSCA(2*MAXNUR),IMESAV(2*MAXNUR),
      &PT2SAV(2*MAXNUR),ZSAV(2*MAXNUR),SHTSAV(2*MAXNUR),
+C...Array to identify the initial-final dipoles
+     &IRIF(2*MAXNUR),
      &MESYS(MAXNUR,0:2),PSUM(5),DPT(5,4)
 C...Statement functions.
       SHAT(L,J)=(P(L,4)+P(J,4))**2-(P(L,1)+P(J,1))**2-
@@ -91,7 +93,31 @@ C...Reset. Remove irrelevant colour tags.
         ENDIF
   110 CONTINUE
       NPARTS=NPART
- 
+
+C...Identify two hardest outgoing partons
+c.....Must do this all beforehand
+      IFP1=0
+      IFP2=0
+      PTFP1=0D0
+      PTFP2=0D0
+      DO 115 IP=1,NPART
+        I=IPART(IP)
+C...Haven't tested this yet -- should identify final-state partons
+C....in LHE files
+C...Mother must be one of the original partons
+        IF(K(I,3).GT.MINT(84)+2) GOTO 115
+C...Removes resonance decay products
+        IF(K(K(I,3),3).GT.0) GOTO 115
+        IF(PTPART(IP).GT.PTFP1) THEN
+           PTFP2=PTFP1
+           IFP2=IFP1
+           PTFP1=PTPART(IP)
+           IFP1=I
+        ELSEIF(PTPART(IP).GT.PTFP2) THEN
+           IFP2=I
+           PTFP2=PTPART(IP)
+        ENDIF
+ 115  CONTINUE
 C...Begin loop to set up showering partons. Sum four-momenta.
       DO 230 IP=1,NPART
         I=IPART(IP)
@@ -145,6 +171,7 @@ C...Basic info about radiating parton.
             ISCOL(NEVOL)=JSGCOL
             ISCHG(NEVOL)=0
             PTSCA(NEVOL)=PTPART(IP)
+            IRIF(NEVOL)=0
  
 C...Begin search for colour recoiler when MODE = 0 or 1.
             IF(MODE.LE.1) THEN
@@ -301,6 +328,15 @@ C...Else save recoiling colour partner
  
 C...Now found other end of colour dipole.
             IREC(NEVOL)=IRNEW
+C...Determine if this is an initial-final dipole
+c.....Check ALSO that mother is initial
+C...Recoiler originates from > 100
+C...Parton originates from < 100 (usually 7,8, etc.)
+            IF(K(IRNEW,3).GT.MINT(84)) THEN
+               IF(K(I,3).LE.MINT(84)+2) IRIF(NEVOL)=1
+            ELSE
+              IRIF(NEVOL)=0
+            ENDIF
           ENDIF
   180   CONTINUE
  
@@ -315,6 +351,7 @@ C...Basic info about radiating parton.
           ISCOL(NEVOL)=0
           ISCHG(NEVOL)=KCHA
           PTSCA(NEVOL)=PTPART(IP)
+          IRIF(NEVOL)=0
  
 C...Pick nearest (= smallest invariant mass) charged particle
 C...as recoiler when MODE = 0 or 1 (but for latter among primaries).
@@ -559,6 +596,10 @@ C...g -> ~g + ~g (eikonal approximation).
           ELSEIF(ITYPMN.EQ.6.AND.ITYPMX.EQ.6.AND.ITYPES.EQ.0) THEN
             ICLASS=16
           ENDIF
+
+C...Revert to eikonal approximation for gluon in final state.
+          IF(KFLA1.EQ.21.OR.KFLA2.EQ.21) ICLASS=1 
+
           M3JC=5*ICLASS+ICOMBI
         ENDIF
  
@@ -638,7 +679,34 @@ C...Skip any particles that are "turned off"
 C...Invariant mass of "dipole".Starting value for pT evolution.
           SHTCOR=(SQRT(SHT)-P(IR,5))**2-PM2I
           PT2=MIN(PT2CMX,0.25D0*SHTCOR,PTSCA(IEVOL)**2)
- 
+C.........else if IREC is potentially a soft gluon from the initial state
+C...Change the showering scale for initial-final dipoles
+          IF(IRIF(IEVOL).EQ.1) THEN
+C...Make sure the recoiler is a different parton
+            IF(I.EQ.IFP1) THEN
+              IR=IFP2
+            ELSE
+              IR=IFP1
+            ENDIF
+C...Recalculate quantities for new recoiler
+            PM2R=P(IR,5)**2
+            SHT=SHAT(I,IR)            
+            SHTCOR=(SQRT(SHT)-P(IR,5))**2-PM2I
+            PT2NEW=MIN(PT2CMX,0.25D0*SHTCOR,PTSCA(IEVOL)**2)
+C...If new pT2 is less than original, then don't change
+            IF(PT2NEW.LE.PT2) THEN
+              IR=IREC(IEVOL)
+              PM2R=P(IR,5)**2
+              SHT=SHAT(I,IR)            
+              SHTCOR=(SQRT(SHT)-P(IR,5))**2-PM2I
+            ELSE
+              PT2=PT2NEW
+            ENDIF
+C...Once the max scale is below threshold, turn off
+C           IF(PT2NEW.EQ.PT2CMX) IRIF(IEVOL)=0
+          ENDIF
+
+
 C...Case of evolution by QCD branching.
           IF(ISCOL(IEVOL).NE.0) THEN
  
@@ -731,6 +799,19 @@ C...Finish if below lower cutoff.
               IFLG(IEVOL)=-1
               GOTO 380
             ENDIF
+
+C...Check if we switch back to original "small" dipole
+C.....Should only have to check once if IR != IREC(IEVOL)
+C...IR has changed and IRIF flag is set and pT2 is "small"
+            IF(IR.NE.IREC(IEVOL).AND.IRIF(IEVOL).NE.0.AND.
+     $        PT2.LT.0.25D0*SHAT(I,IREC(IEVOL))) THEN
+C...Switch back to original recoiler and recalculate
+              IR=IREC(IEVOL)
+              PM2R=P(IR,5)**2
+              SHT=SHAT(I,IR)            
+              SHTCOR=(SQRT(SHT)-P(IR,5))**2-PM2I
+            ENDIF
+
  
 C...Pick kind of branching: q->qg/g->gg/X->Xg or g->qqbar.
 C...IFLAG=1: gluon emission; IFLAG=2: gluon splitting
@@ -826,11 +907,13 @@ C...Weighting by branching kernel, except if ME weighting later.
           ENDIF
  
 C...Save acceptable branching.
+C...If the recoiler changed, update
+          IREC(IEVOL)=IR
           IFLG(IEVOL)=IFLAG
           IMESAV(IEVOL)=IMESYS
           PT2SAV(IEVOL)=PT2
           ZSAV(IEVOL)=Z
-          SHTSAV(IEVOL)=SHT
+          SHTSAV(IEVOL)=SHT            
         ENDIF
  
 C...Check if branching has highest pT.
@@ -855,6 +938,7 @@ C...Restore info on hardest branching to be processed.
       PM2I=P(I,5)**2
       PM2R=P(IR,5)**2
       PM2=PM2I+PT2/(Z*(1D0-Z))
+
  
 C...Special flag for colour octet states.
       MOCT=0
@@ -916,6 +1000,20 @@ C...Create new slots for branching products and recoil.
       IGNEW=N+2
       IRNEW=N+3
       N=N+3
+
+C...Update location of hard final-state parton
+      IF(I.EQ.IFP1) THEN
+         IFP1=INEW
+      ELSEIF(I.EQ.IFP2) THEN
+         IFP2=INEW
+      ENDIF
+C...Update location of recoiler
+      IF(IR.EQ.IFP1) THEN
+         IFP1=IRNEW
+      ELSEIF(IR.EQ.IFP2) THEN
+         IFP2=IRNEW
+      ENDIF
+
  
 C...Set status, flavour and mother of new ones.
       K(INEW,1)=K(I,1)
@@ -1090,7 +1188,7 @@ C...Perform weighting with W_ME/W_PS.
 C...Now for sure accepted branching. Save highest pT.
       IF(NGEN.EQ.1) PTGEN=SQRT(PT2)
  
-C...Update status for obsolete ones. Bookkkep the moved original parton
+C...Update status for obsolete ones. Bookkeep the moved original parton
 C...and new daughter (arbitrary choice for g->gg or g->qqbar).
 C...Do not bookkeep radiated photon, since it cannot radiate further.
       K(I,1)=K(I,1)+10
@@ -1234,6 +1332,7 @@ C...q->qg or g->gg: create new gluon radiators.
         ISCOL(NEVOL)=KCOL
         ISCHG(NEVOL)=0
         PTSCA(NEVOL)=SQRT(PT2)
+        IRIF(NEVOL)=0
         NEVOL=NEVOL+1
         IPOS(NEVOL)=IGNEW
         IREC(NEVOL)=INEW
@@ -1241,6 +1340,7 @@ C...q->qg or g->gg: create new gluon radiators.
         ISCOL(NEVOL)=-KCOL
         ISCHG(NEVOL)=0
         PTSCA(NEVOL)=PTSCA(NEVOL-1)
+        IRIF(NEVOL)=0
 C...g->qqbar: create new photon radiators.
       ELSEIF(KCOL.EQ.2.AND.KFQ.NE.0) THEN
         NEVOL=NEVOL+1
@@ -1250,6 +1350,7 @@ C...g->qqbar: create new photon radiators.
         ISCOL(NEVOL)=0
         ISCHG(NEVOL)=PYK(INEW,6)
         PTSCA(NEVOL)=SQRT(PT2)
+        IRIF(NEVOL)=0
         NEVOL=NEVOL+1
         IPOS(NEVOL)=IGNEW
         IREC(NEVOL)=INEW
@@ -1257,8 +1358,7 @@ C...g->qqbar: create new photon radiators.
         ISCOL(NEVOL)=0
         ISCHG(NEVOL)=PYK(IGNEW,6)
         PTSCA(NEVOL)=SQRT(PT2)
-        CALL PYLIST(4)
-        print*, 'created new QED dipole ',INEW,'<->',IGNEW
+        IRIF(NEVOL)=0
       ENDIF
  
 C...Check color and charge connections,

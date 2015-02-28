@@ -47,8 +47,11 @@ C...Find if particles equal, maximum mass, matrix elements, etc.
         IF(CKIN(2).GT.CKIN(1)) PMMX=MIN(CKIN(2),VINT(1))
       ENDIF
       MMED=0
-      IF((KFMO.EQ.25.OR.KFMO.EQ.35.OR.KFMO.EQ.36).AND.MEQL.EQ.1.AND.
+C      IF((KFMO.EQ.25.OR.KFMO.EQ.35.OR.KFMO.EQ.36).AND.MEQL.EQ.1.AND.
+      IF((KFMO.EQ.25.OR.KFMO.EQ.35).AND.MEQL.EQ.1.AND.
      &(KFD(1).EQ.23.OR.KFD(1).EQ.24)) MMED=1
+      IF(KFMO.EQ.36.AND.MEQL.EQ.1.AND.
+     &(KFD(1).EQ.23.OR.KFD(1).EQ.24)) MMED=4
       IF((KFMO.EQ.32.OR.IABS(KFMO).EQ.34).AND.(KFD(1).EQ.23.OR.
      &KFD(1).EQ.24).AND.(KFD(2).EQ.23.OR.KFD(2).EQ.24)) MMED=2
       IF((KFMO.EQ.32.OR.IABS(KFMO).EQ.34).AND.(KFD(2).EQ.25.OR.
@@ -175,6 +178,7 @@ C...Start inner loop of integration.
 C...Evaluate function value - inner loop.
         FUNC1=SQRT(MAX(0D0,(1D0-RM1-RM2)**2-4D0*RM1*RM2))
         IF(MMED.EQ.1) FUNC1=FUNC1*((1D0-RM1-RM2)**2+8D0*RM1*RM2)
+        IF(MMED.EQ.4) FUNC1=FUNC1**3*RM1*RM2
         IF(MMED.EQ.2) FUNC1=FUNC1**3*(1D0+10D0*RM1+10D0*RM2+RM1**2+
      &  RM2**2+10D0*RM1*RM2)
         IF(FUNC1.GT.FMAX1) FMAX1=FUNC1
@@ -286,6 +290,8 @@ C...Weight with matrix element (if none known, use beta factor).
         FLAM=SQRT(MAX(0D0,(1D0-RMG(1)-RMG(2))**2-4D0*RMG(1)*RMG(2)))
         IF(MMED.EQ.1) THEN
           WTBE=FLAM*((1D0-RMG(1)-RMG(2))**2+8D0*RMG(1)*RMG(2))
+        ELSEIF(MMED.EQ.4) THEN
+          WTBE=FLAM**3*RMG(1)*RMG(2)
         ELSEIF(MMED.EQ.2) THEN
           WTBE=FLAM**3*(1D0+10D0*RMG(1)+10D0*RMG(2)+RMG(1)**2+
      &    RMG(2)**2+10D0*RMG(1)*RMG(2))

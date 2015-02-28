@@ -67,7 +67,7 @@ C...16: SPINFO    17: ALPHA     18: MSOFT     19: QNUMBERS
       INTEGER VERBOS
       SAVE VERBOS
 C...Date of last Change
-      PARAMETER (DOC='10 Jun 2010')
+      PARAMETER (DOC='26 Feb 2013')
 C...Local arrays and initial values
       DIMENSION IDC(5),KFSUSY(50)
       SAVE KFSUSY
@@ -284,9 +284,6 @@ C...Read PDG code
               WRITE(MSTU(11),5000) DOC
               NHELLO=1
             ENDIF
-            WRITE(MSTU(11),'(A,I9,A,F12.3)')
-     &           ' * (PYSLHA:) Reading  '//CHBLCK(1:8)//
-     &           '    for KF =',KFQ
             NQNUM=NQNUM+1
             KQNUM(NQNUM,0)=KFQ
             MSPC(19)=MSPC(19)+1
@@ -299,40 +296,66 @@ C...Only read in new codes (also OK to overwrite if KF > 3000000)
   230           CONTINUE
                 KCQ=KCQ+1
               ENDIF
-              KCC=KCQ
-              KCHG(KCQ,4)=KFQ
-C...First write PDG code as name
-              WRITE(CHTMP,*) KFQ
-              WRITE(CHTMP,'(A)') CHTMP(2:10)
-C...Then look for real name
-              IBEG=9
-  240         IBEG=IBEG+1
-              IF (CHBLCK(IBEG:IBEG).NE.'#'.AND.IBEG.LT.59) GOTO 240
-  250         IBEG=IBEG+1
-              IF (CHBLCK(IBEG:IBEG).EQ.' '.AND.IBEG.LT.59) GOTO 250
-              IEND=IBEG-1
-  260         IEND=IEND+1
-              IF (CHBLCK(IEND+1:IEND+1).NE.' '.AND.IEND.LT.59) GOTO 260
-              IF (IEND.LT.59) THEN
-                READ(CHBLCK(IBEG:IEND),'(A)',ERR=270) CHDUM
-                IF (CHDUM.NE.' ') CHTMP=CHDUM
+C...More than 25 new QNUMBERS: fill up empty space before UED
+              IF (KCQ.GT.500) THEN
+                KCQ=0
+                DO 235 KCT=100,450
+                  IF(KCHG(KCT,4).GT.100) KCQ=KCT
+  235           CONTINUE
+                KCQ=KCQ+1
+                IF (KCQ.EQ.451) THEN
+                  WRITE(MSTU(11),*)
+     &                 '* (PYSLHA:) Warning: too many QNUMBERS. ',
+     &                 'Starting overwrite of UED particles.'
+                ELSE IF (KCQ.EQ.476) THEN
+                  WRITE(MSTU(11),*)
+     &                 '* (PYSLHA:) Error: too many QNUMBERS. ',
+     &                 'Ran out of space, sorry! Try Pythia 8.'
+                  KCQ = 501
+                ENDIF
               ENDIF
-  270         READ(CHTMP,'(A)') CHAF(KCQ,1)
-              MSTU(20)=0
-C...Set stable for now
-              PMAS(KCQ,2)=1D-6
-              MWID(KCQ)=0
-              MDCY(KCQ,1)=0
-              MDCY(KCQ,2)=0
-              MDCY(KCQ,3)=0
+C...End of special case for more than 25 new QNUMERS
+              IF (KCQ.LE.500) THEN 
+                WRITE(MSTU(11),'(A,I9,A,I4,A)')
+     &               ' * (PYSLHA:) Reading  '//CHBLCK(1:8)//
+     &               '    for KF =',KFQ,'    (assigned KC',KCQ,')'
+                KCC=KCQ
+                KCHG(KCQ,4)=KFQ
+C...  First write PDG code as name
+                WRITE(CHTMP,*) KFQ
+                WRITE(CHTMP,'(A)') CHTMP(2:10)
+C...  Then look for real name
+                IBEG=9
+ 240            IBEG=IBEG+1
+                IF (CHBLCK(IBEG:IBEG).NE.'#'.AND.IBEG.LT.59) GOTO 240
+ 250            IBEG=IBEG+1
+                IF (CHBLCK(IBEG:IBEG).EQ.' '.AND.IBEG.LT.59) GOTO 250
+                IEND=IBEG-1
+ 260            IEND=IEND+1
+                IF (CHBLCK(IEND+1:IEND+1).NE.' '.AND.IEND.LT.59) 
+     &               GOTO 260
+                IF (IEND.LT.59) THEN
+                  READ(CHBLCK(IBEG:IEND),'(A)',ERR=270) CHDUM
+                  IF (CHDUM.NE.' ') CHTMP=CHDUM
+                ENDIF
+ 270            READ(CHTMP,'(A)') CHAF(KCQ,1)
+                MSTU(20)=0
+C...  Set stable for now
+                PMAS(KCQ,2)=1D-6
+                MWID(KCQ)=0
+                MDCY(KCQ,1)=0
+                MDCY(KCQ,2)=0
+                MDCY(KCQ,3)=0
+              ENDIF
             ELSE
-              WRITE(MSTU(11),*)
-     &           '* (PYSLHA:) KF =',KFQ,' already exists: ',
-     &             CHAF(KCQ,1), '. Entry ignored.'
+              WRITE(MSTU(11),'(A,I9,A)')
+     &             ' * (PYSLHA:) Warning! Failed to read  '
+     &             //CHBLCK(1:8)//'    for KF =',KFQ,
+     &             ' (entry reserved by PYTHIA)'
               MERR=7
             ENDIF
           ENDIF
-C...Finalize this line and read next.
+C...  Finalize this line and read next.
           GOTO 380
 C...Check for DECAY begin statement (decays).
         ELSEIF (CHINL(1:3).EQ.'DEC') THEN
@@ -529,6 +552,8 @@ C...  Signed masses
                 IF (KF.EQ.1000035) SMZ(4)=VAL
                 IF (KF.EQ.1000024) SMW(1)=VAL
                 IF (KF.EQ.1000037) SMW(2)=VAL
+C...  Also store gravitino mass in RMSS(21), translated to eV unit
+                IF (KF.EQ.1000039) RMSS(21) = 1D9 * VAL
               ENDIF
             ELSEIF (MUPDA.EQ.5) THEN
               MERR=0
@@ -797,7 +822,7 @@ C...  Flip sign if reading antiparticle decays (if antipartner exists)
                 IF (KCHG(PYCOMP(IDC(IDA)),3).NE.0)
      &               IDC(IDA)=MPSIGN*IDC(IDA)
   340         CONTINUE
-C...Switch on decay channel, with products ordered in decreasing ABS(KF)
+C...Switch on decay channel
 C             MDME(NDC,1)=1
               IF(MDME(NDC,1).LT.0.AND.MDME(NDC,1).GE.-5) THEN
                 MDME(NDC,1)=-MDME(NDC,1)
@@ -805,7 +830,22 @@ C             MDME(NDC,1)=1
                 MDME(NDC,1)=1
               ENDIF
 
-              IF (BRAT(NDC).LE.0D0) MDME(NDC,1)=0
+C...Switch off decay channels with < 0 branching fraction
+              IF (BRAT(NDC).LE.0D0) THEN
+                MDME(NDC,1)=0
+C...Else check if decays to gravitinos should be switched on
+              ELSE 
+                DO 345 IDA=1,NDA
+                  IF (IDC(IDA).EQ.1000039) THEN
+C...  Inform user 
+                    IF (IMSS(11).LE.0) WRITE(MSTU(11),*)
+     &                   '* (PYSLHA:) Switching on decays to gravitinos'
+                    IMSS(11) = 2
+                  ENDIF
+ 345            CONTINUE                
+              ENDIF
+
+C...Store decay products ordered in decreasing ABS(KF)
               BRSUM=BRSUM+ABS(BRAT(NDC))
               BRAT(NDC)=ABS(BRAT(NDC))
   350         IFLIP=0
@@ -1080,7 +1120,7 @@ C...If BR's > 1, rescale.
               WRITE(CHTMP,8500) BRSUM
               IF (BRSUM.GT.(1D0+1D-3)) CALL PYERRM(7
      &            ,"(PYSLHA:) Forced rescaling of BR's for KF="//CHKF//
-     &            ' ; sum was'//CHTMP(9:16)//'.')
+     &            ' ; sum was '//CHTMP(9:16)//'.')
               FAC=1D0/BRSUM
               DO 470 IDA=MDCY(KC,2),MDCY(KC,2)+MDCY(KC,3)-1
                 IF(MDME(IDA,2).GT.80) GOTO 470
@@ -1353,9 +1393,9 @@ C...Serious error catching
  8500 FORMAT(F16.5)
  
 C...Formats for user information printout.
- 5000 FORMAT(1x,18('*'),1x,'PYSLHA v1.14: SUSY/BSM SPECTRUM '
+ 5000 FORMAT(1x,18('*'),1x,'PYSLHA v1.15: SUSY/BSM SPECTRUM '
      &     ,'INTERFACE',1x,17('*')/1x,'*',1x
-     &     ,'(PYSLHA:) Last Change',1x,A,1x,'-',1x,'P.Z. Skands')
+     &     ,'(PYSLHA:) Last Change',1x,A,1x,'-',1x,'P. Skands')
  5010 FORMAT(1x,'*',3x,'Wrote spectrum file on unit: ',I3)
  5020 FORMAT(1x,'*',3x,'Read spectrum file on unit: ',I3)
  5030 FORMAT(1x,'*',3x,'Spectrum Calculator was: ',A,' version ',A)

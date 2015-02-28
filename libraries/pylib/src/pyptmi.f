@@ -491,6 +491,14 @@ C...Ensure that pdfs are positive definite
         DO 310 IVC=1,NVC(JS,IFL)
           CMP=CMP+XPSVC(IFL,IVC)
   310   CONTINUE
+C...PS 05 Aug 2012: bug fix to prevent heavy companion quarks from being
+C...picked up by MPI (necessary since intertwining not implemented)
+C...Here simply reclassify companions as ordinary SEA. Will give 
+C...additional spurious companions, but is simplest solution.
+        IF (IABS(IFL).EQ.4.OR.IABS(IFL).EQ.5) THEN
+          SEA = SEA + CMP
+          CMP = 0D0
+        ENDIF
  
         NTRY=0
 C...Decide (Extra factor x cancels in the dvision).

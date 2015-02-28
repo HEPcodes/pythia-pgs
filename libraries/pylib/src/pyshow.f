@@ -358,6 +358,10 @@ C...g -> ~g + ~g (eikonal approximation).
           ELSEIF(ITYPMN.EQ.6.AND.ITYPMX.EQ.6.AND.ITYPES.EQ.0) THEN
             ICLASS=16
           ENDIF
+
+C...Revert to eikonal approximation for gluon in final state.
+          IF(KFLA1.EQ.21.OR.KFLA2.EQ.21) ICLASS=1 
+
           M3JC=5*ICLASS+ICOMBI
         ENDIF
       ENDIF

@@ -612,6 +612,12 @@ C...x and x*pdf (+ sea/val) at new pT2 for parton A.
           ELSE
             XFJ(KFLA)=PYFCMP(Y(MJ)/VINT(140),YS/VINT(140),MSTP(87))
           ENDIF
+C...PS 05 Aug 2012: bug fix to prevent heavy companion quarks from being
+C...picked up by ISR (necessary since intertwining not implemented)
+C...Here simply kill backwards-evolution probability.
+          IF (KFLB.EQ.21.AND.(IABS(KFLA).EQ.4.OR.IABS(KFLA).EQ.5)) THEN
+            IF (KSVCA.GE.1) WTVETO = 0D0
+          ENDIF
           WTVETO=WTVETO*XFJ(KFLA)
 C...Monte Carlo veto to accept trial joining
           IF (WTVETO.LT.PYR(0)) GOTO 200
@@ -731,17 +737,6 @@ C...1 Option to completely kill radiation above s_dip * PARP(67)
 C...2 Option to allow suppressed unordered radiation above s_dip * PARP(67)
 C...  (-> improved power showers?)
             IF (4D0*PT2*PYR(0).GT.PARP(67)*SDIP) GOTO 230
-          ENDIF
-C...Also impose angular constraint in first branching if interference
-C...with final state partons (generalized to 2->3 and higher processes)
-          IF (NDIP.GE.1) THEN
-            DSH=SHAT
-            IF(ISET(ISUB).GE.3.AND.ISET(ISUB).LE.5) DSH=VINT(26)*VINT(2)
-            THE2D=(4D0*Q2B)/(DSH*(1D0-Z))
-            THE2J=PYANGL(P(JDIP,3),SQRT(P(JDIP,1)**2+P(JDIP,2)**2))
-            IF (P(IDIP,3).LE.0D0) THE2J = PARU(1) - THE2J
-C...Impose angular veto
-            IF (THE2D.GT.THE2J) GOTO 230
           ENDIF
           
 C...For subsequent branchings, loopback if nonordered in angle/rapidity
@@ -1062,7 +1057,6 @@ C...Global statistics.
         MINT(352)=MINT(352)+1
         VINT(352)=VINT(352)+SQRT(P(IT,1)**2+P(IT,2)**2)
         IF (MINT(352).EQ.1) VINT(357)=SQRT(P(IT,1)**2+P(IT,2)**2)
-        IF (MINT(352).EQ.1) VINT(360)=SQRT(PT2NOW)
  
 C...Add parton with relevant pT scale for timelike shower.
         IF (K(IT,2).NE.22) THEN
