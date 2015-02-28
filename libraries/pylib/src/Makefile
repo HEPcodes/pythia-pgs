@@ -1,5 +1,4 @@
-#SRCS := $(wildcard *.f)
-SRCS := $(wildcard py*.f) $(wildcard struct*.f) $(wildcard up*.f) ssmssm.f sugra.f visaje.f $(wildcard fh*.f) pdfset.f
+SRCS := $(wildcard *.f)
 OBJS = ${SRCS:.f=.o}
 
 include ../../../src/make_opts
