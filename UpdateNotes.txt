@@ -1,5 +1,7 @@
 Update notes for the Pythia-PGS package used by MadGraph/MadEvent
 
+2.3.0 (22/04/14) Support for stdhep file with size larger than 4 Go. External tools might not support the new format.
+
 2.2.1 (21/02/14) Fix a compilation issue on some linux
 
 2.2.0  (16/12/13) Read and store information needed for systematics
