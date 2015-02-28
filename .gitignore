@@ -4,6 +4,10 @@
 /src/mass_width_2004.mc
 /src/pydata.f
 /src/PDFsets
+/src/clean_output
+/src/hep2lhe
+/src/pgs
+/src/pythia
 /src/lhapdf/PDFsets
 
 /libraries/lhapdf/Makefile
