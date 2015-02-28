@@ -362,6 +362,12 @@ C...CTEQ Family
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/cteq4l.LHgrid'
 	   Q2MIN = 2.56D0
            XMIN=1.0D-5
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $          .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -437,6 +443,12 @@ C...MRST Family
           ELSEIF((LHAINPUT .GE. 29070) .AND. (LHAINPUT .LE. 29071)) THEN
            LHASET = 29070
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/MRST98ht.LHgrid'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $          .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -449,6 +461,12 @@ C...Fermi Family
           ELSEIF((LHAINPUT .GE. 31000) .AND. (LHAINPUT .LE. 32000)) THEN
            LHASET = 31000
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/Fermi2002_1000.LHpdf'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $          .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -479,6 +497,12 @@ C...Alekhin Family
            XMIN = 1.0D-7
 	   Q2MIN = 0.8D0
 	   Q2MAX = 2.0D08
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $          .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -491,6 +515,12 @@ C...Botje Family
           ELSEIF((LHAINPUT .GE. 51000) .AND. (LHAINPUT .LE. 51999)) THEN
            LHASET = 51000
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/Botje_1000.LHpdf'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $          .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -511,6 +541,12 @@ C...ZEUS Family
           ELSEIF((LHAINPUT .GE. 60300) .AND. (LHAINPUT .LE. 60322)) THEN
            LHASET = 60300
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/ZEUS2005_ZJ.LHpdf'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $          .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -544,6 +580,12 @@ C...H1 Family
           ELSEIF((LHAINPUT .GE. 70351) .AND. (LHAINPUT .LE. 70370)) THEN
            LHASET = 70350
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/H12000lo2E.LHgrid'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $          .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -575,6 +617,12 @@ C...OW-PI Family
           IF((LHAINPUT .GE. 210) .AND. (LHAINPUT .LE. 212)) THEN
            LHASET = 210
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/OWPI.LHgrid'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $          .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -588,6 +636,12 @@ C...SMRS-PI Family
           IF((LHAINPUT .GE. 230) .AND. (LHAINPUT .LE. 233)) THEN
            LHASET = 230
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/SMRSPI.LHgrid'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $                     .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -605,6 +659,12 @@ C...GRV-PI Family
 	   Q2MIN = 2.5D-1
            LHASET = 252
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/GRVPI0.LHgrid'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $                        .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -618,6 +678,12 @@ C...ABFKW-PI Family
           IF((LHAINPUT .GE. 260) .AND. (LHAINPUT .LE. 263)) THEN
            LHASET = 260
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/ABFKWPI.LHgrid'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $                    .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -637,6 +703,12 @@ C...DO-G Family
           ELSEIF((LHAINPUT .GE. 312) .AND. (LHAINPUT .LE. 312)) THEN
            LHASET = 312
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/DOG1.LHgrid'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $                        .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -665,6 +737,12 @@ C...DG-G Family
 	   Q2MAX = 1.0D04
            LHASET = 324
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/DGG.LHgrid'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $                       .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -686,6 +764,12 @@ C...LAC/GAL-G Family
 	   Q2MIN = 4.0D00
            LHASET = 334
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/LACG.LHgrid'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $                        .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -708,6 +792,12 @@ C...GSG/GSG96-G Family
           ELSEIF((LHAINPUT .GE. 345) .AND. (LHAINPUT .LE. 345)) THEN
            LHASET = 345
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/GSG960.LHgrid'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $                        .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -730,6 +820,12 @@ C...GRV-G Family
 	   Q2MAX = 5.0D04
            LHASET = 354
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/GRVG0.LHgrid'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $                        .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -743,6 +839,12 @@ C...ACFGP-G Family
           IF((LHAINPUT .GE. 360) .AND. (LHAINPUT .LE. 363)) THEN
            LHASET = 360
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/ACFGPG.LHgrid'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $          .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -756,6 +858,12 @@ C...WHIT-G Family
           IF((LHAINPUT .GE. 380) .AND. (LHAINPUT .LE. 386)) THEN
            LHASET = 380
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/WHITG.LHgrid'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $                    .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
@@ -781,6 +889,12 @@ C...SAS-G Family
 	   Q2MIN = 4.0D00
            LHASET = 397
            LHANAME=LHAPATH(1:LHAPATHLEN)//'/SASG.LHgrid'
+          ELSEIF(LHAPDF_IF_UNKNOW.ne.0
+     $          .and.LHAINPUT.ne.LHAPDF_IF_UNKNOW)then
+           WRITE(LHAPRINT,5150)  LHASET
+           WRITE(LHAPRINT,*) "WILL USE", LHAPDF_IF_UNKNOW ,"INSTEAD"
+           LHAINPUT = LHAPDF_IF_UNKNOW
+           GOTO 10   
           ELSE
            WRITE(LHAPRINT,5150)  LHASET
            STOP
