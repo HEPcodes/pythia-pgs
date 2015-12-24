@@ -1,5 +1,7 @@
 Update notes for the Pythia-PGS package used by MadGraph/MadEvent
 
+2.4.4 (4/10/2015) - fix a bug preventing pythia to run on e+ e- colision with systematics on.
+
 2.4.3 (17/01/15) - fix some compilation problem on Debian
 
 2.4.2 (14/01/15) - pass to pythia 6.4.28

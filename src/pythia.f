@@ -374,7 +374,11 @@ c             Write info about PDF used in original event file
               WRITE(CGIVE0,'(a,I1,a)') '(a,I',
      $             INT(log10(REAL(PDFSUP(1))))+1,',a)'
               WRITE(11,'(a)') '<header>'
-              WRITE(11,CGIVE0) '<orgpdf>',PDFSUP(1),'</orgpdf>'
+              if (PDFSUP(1).ne.0)then
+                 WRITE(11,CGIVE0) '<orgpdf>',PDFSUP(1),'</orgpdf>'
+              else
+                 WRITE(11,'(a)') '<orgpdf> 0 </orgpdf>'
+              endif
 c             Write info about beams
               WRITE(11,'(a,2I3,a)') '<beams>',SIGN(1,IDBMUP(1)),
      $             SIGN(1,IDBMUP(2)),'</beams>'
