@@ -119,11 +119,13 @@ C   Local variables
       INTEGER JS,IFAIL
       INTEGER J,KSORTJ(NMAX),KSORTC(NMAX),ib,ibbar,idres1,idres2,IMOT
       INTEGER NFOUND(10)
-      LOGICAL internal
+      LOGICAL internal, card_exists
       DATA internal/.false./
 
 C...Set pythia input card and STDHEP output file
       pythia_card='../Cards/pythia_card.dat'
+      INQUIRE(FILE=pythia_card, EXIST=card_exists)
+      if(.not.card_exists) pythia_card='./pythia_card.dat'
       output_file='pythia_events.hep'
 
 C...Set Pythia output to lnhout
@@ -554,7 +556,8 @@ C...Inputs for the matching algorithm
              else if(index(line,'qcut').ne.0) then
                 READ(line(index(line,'=')+1:),*,err=100) qcut
                 write(*,*) 'Read Qcut   = ',qcut
-             else if(index(line,'lhaid').ne.0) then
+             else if(index(line,'lhaid').ne.0.or.
+     $               index(line,'LHAID').ne.0) then
                READ(line(index(line,'=')+1:),*,err=100)LHAPDF_IF_UNKNOW
                write(*,*) 'Read LHAID   = ',LHAPDF_IF_UNKNOW
              else if(index(line,'etcjet').ne.0) then
