@@ -321,8 +321,8 @@ C...Check minimum invariant mass of remnant system(s).
      &  P(MINT(83)+JT+2,2)**2)
   340 CONTINUE
       IF(PMIN(0)+PMIN(1)+PMIN(2).GT.VINT(1).OR.(MINT(45).GE.2.AND.
-     &PMIN(1).GT.PSYS(1,4)).OR.(MINT(46).GE.2.AND.PMIN(2).GT.
-     &PSYS(2,4))) THEN
+     &PMIN(1).GT.PSYS(1,4)+1d-8).OR.(MINT(46).GE.2.AND.PMIN(2).GT.
+     &PSYS(2,4)+1d-8)) THEN
         MINT(51)=1
         MINT(57)=MINT(57)+1
         RETURN
